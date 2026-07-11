@@ -10,6 +10,12 @@ class Product(models.Model):
 
     name = models.CharField(max_length=255)
     sku = models.CharField(max_length=100, unique=True)
+    # as it is a foreign key, so index to this category field is added for optimization.
+    category = models.ForeignKey(
+        'Category',
+        on_delete=models.SET_NULL, # If category is deleted, set category to NULL instead of deleting the product.
+        related_name='products',
+    )
     description = models.TextField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
     stock = models.IntegerField()
