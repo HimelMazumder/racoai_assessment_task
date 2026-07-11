@@ -12,3 +12,10 @@ wheels/
 # Antigravity/Gemini IDE specific files and directories
 .gemini/
 .antigravity/
+
+# Environments and documentation
+.env
+docs/
+
+# Database
+*.sqlite3

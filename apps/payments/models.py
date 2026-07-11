@@ -20,7 +20,7 @@ class Payment(models.Model):
     transaction_id = models.CharField(max_length=255, unique=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICE, default='pending')
     raw_response = models.JSONField(null=True, blank=True)
-    created_ate = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True)
     
     def __str__(self):
         return f"{self.provider.upper()} Payment {self.transaction_id} - {self.status}"

@@ -17,10 +17,25 @@ class Product(models.Model):
     created_at = models.DateTimeField(auto_now_add=True) # auto_now_add - on first time creation only
     updated_at = models.DateTimeField(auto_now=True) # auto_now - on every time update
 
-    class meta:
-        indexes = [
-            models.Index(fields=['sku'],)
-        ]
+    # as sku is unique, it will automatically be indexed.
+    # class Meta:
+    #     indexes = [
+    #         models.Index(fields=['sku'],)
+    #     ]
 
     def __str__(self):
         return f"{self.name} ({self.sku})"
+
+class Category(models.Model):
+    name = models.CharField(max_length=100)
+    parent = models.ForeignKey(
+        'self',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='subcategories', 
+    )
+    slug = models.SlugField(unique=True) # URL and User friendly Text Version of name. e.g. "smart-phone" instead of "Smart Phone"
+
+    def __str__(self):
+        return self.name
