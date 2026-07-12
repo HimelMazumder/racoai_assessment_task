@@ -198,6 +198,40 @@ A minimal, premium React frontend is provided in the sibling `frontend/` directo
 
 ---
 
+## Superuser & Database Seeding
+
+### 1. Predefined Superuser
+A default superuser is automatically configured when running the seed command:
+- **Username:** `admin`
+- **Password:** `admin1234`
+- **Email:** `admin@example.com`
+
+### 2. Seeding the Database
+To populate the database with core categories and default products:
+```bash
+docker compose exec -T web uv run python manage.py seed
+```
+
+### 3. Creating a Custom Superuser
+To create a new administrative user interactively:
+```bash
+docker compose exec -it web uv run python manage.py createsuperuser
+```
+
+### 4. CSRF Trusted Origins for Proxy/ngrok Tunnels
+When accessing the Django Admin panel (`/admin/`) through a public proxy or `ngrok` tunnel, Django's CSRF middleware requires trusted origins. The system automatically maps all hosts specified in `ALLOWED_HOSTS` to `CSRF_TRUSTED_ORIGINS` under both `http` and `https` protocols:
+```python
+CSRF_TRUSTED_ORIGINS = []
+for host in ALLOWED_HOSTS:
+    host_clean = host.strip()
+    if host_clean and host_clean != '*':
+        CSRF_TRUSTED_ORIGINS.append(f"http://{host_clean}")
+        CSRF_TRUSTED_ORIGINS.append(f"https://{host_clean}")
+```
+This ensures secure logins through any registered ngrok address (e.g. `https://squiggle-dares-trapping.ngrok-free.dev`) out-of-the-box.
+
+---
+
 ## Documentation
 - **[System Architecture](docs/system_architecture.md)**: High-level overview of backend services, APIs, data stores, caching, and client integrations.
 - **[ERD Diagram](docs/erd.md)**: Relational schema map displaying tables, fields, unique constraints, and foreign key rules (PROTECT, CASCADE).

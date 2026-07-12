@@ -37,6 +37,13 @@ DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '*').split(',')
 
+CSRF_TRUSTED_ORIGINS = []
+for host in ALLOWED_HOSTS:
+    host_clean = host.strip()
+    if host_clean and host_clean != '*':
+        CSRF_TRUSTED_ORIGINS.append(f"http://{host_clean}")
+        CSRF_TRUSTED_ORIGINS.append(f"https://{host_clean}")
+
 
 # Application definition
 
