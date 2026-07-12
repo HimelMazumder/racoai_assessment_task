@@ -16,6 +16,8 @@ import dj_database_url
 from pathlib import Path
 from dotenv import load_dotenv
 
+from datetime import timedelta
+
 load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -143,5 +145,19 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+# Auth and User specific setups
 AUTH_USER_MODEL = 'users.User'
+
+# Rest Framework JWT authentication
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+}
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
+}
+
 
