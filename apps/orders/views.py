@@ -30,12 +30,17 @@ class CheckoutView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, pk):
-        provider = request.data.get('provider')
+        provider = request.data.get('provider')  
         if not provider:
             return Response({'error': 'provider is required'}, status=status.HTTP_400_BAD_REQUEST)
         
         try:
-            payment_info = process_order_checkout(pk, provider)
+            order = Order.objects.get(id=pk, user=request.user)
+        except Order.DoesNotExist:
+            return Response({'error': 'Order not found.'}, status=status.HTTP_404_NOT_FOUND)
+            
+        try:
+            payment_info = process_order_checkout(order.id, provider)
             return Response(payment_info, status=status.HTTP_200_OK)
         except ValueError as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
