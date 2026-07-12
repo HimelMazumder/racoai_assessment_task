@@ -39,7 +39,12 @@ def get_subtree_ids(category):
 def get_related_products(product_id, limit=10):
     try:
         product = Product.objects.get(id=product_id)
-        category_ids = get_subtree_ids(product.categories)
+
+        # for product with no category, or category set as null
+        if not product.category:
+            return []
+
+        category_ids = get_subtree_ids(product.category)
 
         related = Product.objects.filter(
             category_id__in=category_ids,

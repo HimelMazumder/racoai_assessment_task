@@ -15,6 +15,8 @@ class Product(models.Model):
         'Category',
         on_delete=models.SET_NULL, # If category is deleted, set category to NULL instead of deleting the product.
         related_name='products',
+        null=True,
+        blank=True,
     )
     description = models.TextField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
