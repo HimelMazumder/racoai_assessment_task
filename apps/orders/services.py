@@ -14,4 +14,6 @@ def update_order_total(order_id):
         order.save()
 
         return order.total_amount
+
+
         
