@@ -4,6 +4,8 @@ from rest_framework.response import Response
 from .models import Order
 from .serializers import OrderSerializer, OrderCreateSerializer
 from apps.orders.checkout import process_order_checkout
+from drf_spectacular.utils import extend_schema, inline_serializer
+from rest_framework import serializers
 
 class OrderListCreateView(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
@@ -29,6 +31,13 @@ class OrderDetailView(generics.RetrieveAPIView):
 class CheckoutView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
+    # Inside CheckoutView:
+    @extend_schema(
+        request=inline_serializer(
+            name='CheckoutRequest',
+            fields={'provider': serializers.ChoiceField(choices=['stripe', 'bkash'])}
+        )
+    )
     def post(self, request, pk):
         provider = request.data.get('provider')  
         if not provider:

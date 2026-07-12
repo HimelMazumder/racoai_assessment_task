@@ -6,6 +6,7 @@ from apps.payments.services import handle_payment_callback
 
 class StripeWebhookView(APIView):
     permission_classes = [AllowAny]  
+    authentication_classes = []
 
     def post(self, request):
         payload = request.data
@@ -18,6 +19,7 @@ class StripeWebhookView(APIView):
 
 class BkashWebhookView(APIView):
     permission_classes = [AllowAny]  
+    authentication_classes = []
 
     def post(self, request):
         payload = request.data

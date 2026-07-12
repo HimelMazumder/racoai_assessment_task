@@ -1,0 +1,13 @@
+# Technical Reflection & Architectural Decisions
+
+### 1. Strategy Design Pattern Implementation
+For the core payment processing layer, we decoupled the business logic from specific payment providers using the **Strategy Pattern**. By establishing an abstract base class (`BasePaymentStrategy`), the application enforces a strict interface contract (`initiate_payment` and `verify_payment`). This architecture allows the platform to seamlessly scale from supporting Stripe and bKash to integrating new regional gateways without modifying the underlying core checkout engine, strictly adhering to the Open/Closed Principle.
+
+### 2. Category Tree Traversal & Redis Optimization
+To efficiently manage deeply nested catalog categories without incurring recursive database queries ($O(N)$ database hits), the tree structure is computed recursively via a **Depth-First Search (DFS)** algorithm. To optimize subsequent reads, this tree structure is serialized and cached globally inside **Redis**. The operational complexity shifts from a costly relational table query to a sub-millisecond $O(1)$ memory lookup, featuring an automatic cache-invalidation hook tied to Django's database signals whenever a category model updates.
+
+### 3. Isolation of Post-Payment Processes
+To maintain strict system stability and ensure external network latency never blocks vital database connections, post-payment processing is heavily isolated. The initial database transaction handles *only* thread-safe inventory reduction and state transition updates. Secondary, non-critical actions (such as generating transaction receipts, triggering push notifications, or dispatching customer confirmation emails) are offloaded to **Celery asynchronous task workers** backed by a Redis message broker, decoupling the user-facing request/response cycle entirely.
+
+### 4. Gateway Callback Validation Strategy
+To safeguard the system against transaction spoofing, pricing vulnerabilities, and malicious callback injections, the webhook routing views incorporate strict defensive guardrails. The system implements gateway-specific signature verification (using asymmetric key verification and provider-supplied signing secrets). Additionally, the callback engine performs an explicit double-check verification by running an out-of-band server-to-server API query back to the payment provider using the raw `transaction_id` before confirming any billing lifecycle status updates.
