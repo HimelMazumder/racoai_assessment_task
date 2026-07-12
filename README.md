@@ -2,7 +2,11 @@
 
 A Django REST Framework backend for managing users, products, orders, and payments with support for multiple payment providers (Stripe, bKash).
 
+- **GitHub Repository**: [racoai_assessment_task](https://github.com/HimelMazumder/racoai_assessment_task)
+- **Deployed Frontend URL**: [rocoaivercel.vercel.app](https://rocoaivercel.vercel.app/)
+
 ## Tech Stack
+
 
 - **Framework:** Django 6.0 + Django REST Framework
 - **Database:** PostgreSQL 15
@@ -22,8 +26,8 @@ A Django REST Framework backend for managing users, products, orders, and paymen
 ### 1. Clone & Configure
 
 ```bash
-git clone <your-repo-url>
-cd backend
+git clone https://github.com/HimelMazumder/racoai_assessment_task.git
+cd racoai_assessment_task/backend
 ```
 
 Create a `.env` file in the project root:
@@ -166,12 +170,40 @@ backend/
 └── manage.py
 ```
 
-## Documentation
+## Frontend Application
 
+A minimal, premium React frontend is provided in the sibling `frontend/` directory. It is built using React + Vite and styled with a glassmorphic dark-mode CSS theme.
+
+### Features:
+- **JWT Authentication**: User login/registration with secure token storage.
+- **Product & Category browsing**: DFS category tree navigation with status badge indicators.
+- **Cart & Order Flow**: Live cart subtotal calculations and order submission.
+- **Checkout Simulator**: Switch between Stripe/bKash, retrieve transaction IDs, and simulate successful webhook events with 1 click to update database state and inventory stock level.
+
+### Running Frontend Locally:
+1. Navigate to the frontend directory:
+   ```bash
+   cd ../frontend
+   ```
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Run the development server:
+   ```bash
+   npm run dev
+   ```
+4. Open your browser to `http://localhost:5173`.
+5. Enter your Django API URL at the top of the interface (e.g. `http://localhost:8000` or your public `ngrok` domain) to connect instantly.
+
+---
+
+## Documentation
 - **[System Architecture](docs/system_architecture.md)**: High-level overview of backend services, APIs, data stores, caching, and client integrations.
 - **[ERD Diagram](docs/erd.md)**: Relational schema map displaying tables, fields, unique constraints, and foreign key rules (PROTECT, CASCADE).
 - **[Stripe Payment Flow](docs/stripe_payment_flow.md)**: Step-by-step sequence diagram outlining order checkout, webhook delivery, and concurrency/stock reduction.
 - **[bKash Payment Flow](docs/bkash_payment_flow.md)**: Sequence diagram showing redirect-based merchant checkout and asynchronous callback verification.
 - **[Technical Reflections](docs/architectural_reflections.md)**: Written answers to the 4 main design questions (Strategy pattern structure, DFS category tree + caching logic, thread-safe stock reduction, and webhook security).
 - **[Project Report](docs/project_report.md)**: Detailed report covering implementation approach, design choices, rejected alternatives, testing coverage details, and the final project verdict.
+
 

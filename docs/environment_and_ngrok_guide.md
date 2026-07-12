@@ -26,7 +26,13 @@ REDIS_URL=redis://redis:6379/1
 # Django Core Settings
 SECRET_KEY=your-super-secure-django-secret-key-here
 DEBUG=True
-ALLOWED_HOSTS=localhost,127.0.0.1,web
+# added ngrok urls also
+ALLOWED_HOSTS=localhost,127.0.0.1,web,squiggle-dares-trapping.ngrok-free.dev
+
+# Stripe Settings
+STRIPE_SECRET_KEY=your-stripe-secret-key-here
+STRIPE_PUBLISHABLE_KEY=your-stripe-publishable-key-here
+STRIPE_WEBHOOK_SECRET=your-stripe-webhook-secret-here
 ```
 
 ### Variable Reference:
@@ -36,6 +42,10 @@ ALLOWED_HOSTS=localhost,127.0.0.1,web
 - **`SECRET_KEY`**: A unique, random string used by Django to provide cryptographic signing.
 - **`DEBUG`**: Boolean set to `True` for development stack traces and `False` for production.
 - **`ALLOWED_HOSTS`**: Whitelisted list of host/domain names that this Django site can serve.
+- **`STRIPE_SECRET_KEY`**: Stripe secret API key (starts with `sk_test_`). Used to perform backend payment intents creations.
+- **`STRIPE_PUBLISHABLE_KEY`**: Stripe publishable API key (starts with `pk_test_`). Used in frontend checkout elements.
+- **`STRIPE_WEBHOOK_SECRET`**: Stripe webhook signing secret (starts with `whsec_`). Used to verify payload integrity on webhooks callbacks.
+
 
 ---
 
@@ -45,35 +55,50 @@ Payment providers (Stripe, bKash) confirm transaction completion by sending asyn
 
 `ngrok` solves this by establishing a secure, public HTTPS tunnel to your local server.
 
-### Step 1: Download & Install ngrok
-Download the ngrok client suitable for your Operating System:
-- **Linux / macOS / Windows:** Download from [ngrok.com/download](https://ngrok.com/download)
-- Add the executable to your system path.
-
-### Step 2: Establish the Tunnel
-Run the following command in a new terminal window to expose your local port `8000`:
+### Step 1: Download & Install ngrok on Ubuntu
+Install the official ngrok agent repository and client using the following apt-key commands:
 
 ```bash
-ngrok http 8000
+curl -sSL https://ngrok-agent.s3.amazonaws.com/ngrok.asc \
+  | sudo tee /etc/apt/trusted.gpg.d/ngrok.asc >/dev/null \
+  && echo "deb https://ngrok-agent.s3.amazonaws.com bookworm main" \
+  | sudo tee /etc/apt/sources.list.d/ngrok.list \
+  && sudo apt update \
+  && sudo apt install ngrok
 ```
 
-This will launch a status screen displaying a public HTTPS URL (e.g., `https://a1b2-34-56-78.ngrok-free.app`).
+### Step 2: Add Authtoken Configuration
+Add your account's authentication token to register the client:
 
-### Step 3: Configure Allowed Hosts
+```bash
+ngrok config add-authtoken $YOUR_AUTHTOKEN
+```
+
+### Step 3: Establish the Tunnel to local Docker Port 8000
+Start the tunnel and bind it to your static domain name, mapping it to port `8000` where the Django container is exposed:
+
+```bash
+ngrok http --url=squiggle-dares-trapping.ngrok-free.dev 8000
+```
+
+This will launch the ngrok status screen showing active forwarding to `http://localhost:8000`.
+
+
+### Step 4: Configure Allowed Hosts
 Django blocks traffic from unknown host headers. You must add your public ngrok subdomain to your `.env` file's `ALLOWED_HOSTS` setting:
 
 ```env
-ALLOWED_HOSTS=localhost,127.0.0.1,web,a1b2-34-56-78.ngrok-free.app
+ALLOWED_HOSTS=localhost,127.0.0.1,web,squiggle-dares-trapping.ngrok-free.dev
 ```
 
-*(Note: Replace `a1b2-34-56-78.ngrok-free.app` with the actual tunnel URL provided by ngrok).*
+*(Note: Replace `squiggle-dares-trapping.ngrok-free.dev` with the actual tunnel URL provided by ngrok).*
 
-### Step 4: Configure Webhooks in Dashboards
+### Step 5: Configure Webhooks in Dashboards
 Use your public ngrok address to construct the webhook URLs, and register them inside your provider dashboards:
 
 - **Stripe Dashboard Webhook URL:**
-  `https://a1b2-34-56-78.ngrok-free.app/api/payments/webhook/stripe/`
+  `https://squiggle-dares-trapping.ngrok-free.dev/api/payments/webhook/stripe/`
 - **bKash Sandbox Webhook URL:**
-  `https://a1b2-34-56-78.ngrok-free.app/api/payments/webhook/bkash/`
+  `https://squiggle-dares-trapping.ngrok-free.dev/api/payments/webhook/bkash/`
 
 All incoming transaction callbacks will now be forwarded to your local development environment.
