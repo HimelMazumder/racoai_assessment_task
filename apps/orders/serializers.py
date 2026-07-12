@@ -42,6 +42,23 @@ class OrderCreateSerializer(serializers.Serializer):
             update_order_total(order.id)
         return order
 
+    def validate_items(self, value):
+        from apps.products.models import Product
+        
+        for item in value:
+            product_id = item['product_id']
+            try:
+                product = Product.objects.get(id=product_id)
+                if product.status != 'active':
+                    raise serializers.ValidationError(
+                        f"Product '{product.name}' is inactive and cannot be ordered."
+                    )
+            except Product.DoesNotExist:
+                raise serializers.ValidationError(
+                    f"Product with ID {product_id} does not exist."
+                )
+        return value
+
 class OrderSerializer(serializers.ModelSerializer):
     items = OrderItemSerializer(many=True, read_only=True)
     payments = PaymentSerializer(many=True, read_only=True) 
