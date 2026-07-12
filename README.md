@@ -168,9 +168,10 @@ backend/
 
 ## Documentation
 
-- [System Architecture](docs/system_architecture.md)
-- [ERD Diagram](docs/erd.md)
-- [Stripe Payment Flow](docs/stripe_payment_flow.md)
-- [bKash Payment Flow](docs/bkash_payment_flow.md)
-- [Technical Reflections](docs/architectural_reflections.md)
-- [Project Report](docs/project_report.md)
+- **[System Architecture](docs/system_architecture.md)**: High-level overview of backend services, APIs, data stores, caching, and client integrations.
+- **[ERD Diagram](docs/erd.md)**: Relational schema map displaying tables, fields, unique constraints, and foreign key rules (PROTECT, CASCADE).
+- **[Stripe Payment Flow](docs/stripe_payment_flow.md)**: Step-by-step sequence diagram outlining order checkout, webhook delivery, and concurrency/stock reduction.
+- **[bKash Payment Flow](docs/bkash_payment_flow.md)**: Sequence diagram showing redirect-based merchant checkout and asynchronous callback verification.
+- **[Technical Reflections](docs/architectural_reflections.md)**: Written answers to the 4 main design questions (Strategy pattern structure, DFS category tree + caching logic, thread-safe stock reduction, and webhook security).
+- **[Project Report](docs/project_report.md)**: Detailed report covering implementation approach, design choices, rejected alternatives, testing coverage details, and the final project verdict.
+
