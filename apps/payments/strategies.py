@@ -1,4 +1,6 @@
 from abc import ABC, abstractmethod
+import stripe
+from django.conf import settings
 from apps.orders.models import Order
 
 class BasePaymentStrategy(ABC):
@@ -13,6 +15,23 @@ class BasePaymentStrategy(ABC):
 class StripePaymentStrategy(BasePaymentStrategy):
     def initiate_payment(self, order: Order, **kwargs) -> dict:
         try:
+            if settings.STRIPE_SECRET_KEY:
+                stripe.api_key = settings.STRIPE_SECRET_KEY
+                # Convert order amount to cents
+                amount_in_cents = int(order.total_amount * 100)
+                intent = stripe.PaymentIntent.create(
+                    amount=amount_in_cents,
+                    currency=kwargs.get('currency', 'usd'),
+                    metadata={'order_id': str(order.id)}
+                )
+                return {
+                    "provider": "stripe",
+                    "transaction_id": intent.id,
+                    "status": "pending",
+                    "client_secret": intent.client_secret,
+                    "raw_response": intent.to_dict() if hasattr(intent, 'to_dict') else dict(intent)
+                }
+
             # mocking the response for development purpose
             return {
                 "provider": "stripe",
@@ -39,6 +58,7 @@ class StripePaymentStrategy(BasePaymentStrategy):
             "status": status,
             "raw_response": payload
         }
+
 
 class BkashPaymentStrategy(BasePaymentStrategy):
     def initiate_payment(self, order: Order, **kwargs) -> dict:
